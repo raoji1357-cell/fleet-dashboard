@@ -41,47 +41,11 @@
       background: #495057;
     }
 
-    /* Main content */
+    /* Main content placeholder */
     .main {
       flex: 1;
       padding: 20px;
       overflow-x: auto;
-    }
-
-    h1 {
-      margin-top: 0;
-      margin-bottom: 15px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      background: #fff;
-    }
-
-    th, td {
-      border: 1px solid #ccc;
-      padding: 6px;
-      text-align: center;
-      font-size: 13px;
-    }
-
-    th {
-      background: #e9ecef;
-      position: sticky;
-      top: 0;
-      z-index: 1;
-    }
-
-    tr:nth-child(even) {
-      background: #f6f6f6;
-    }
-
-    .note {
-      margin-top: 10px;
-      font-size: 12px;
-      color: #666;
     }
   </style>
 </head>
@@ -90,115 +54,24 @@
 
   <div class="sidebar">
     <h2>📊 Fleet Reports</h2>
-    <div class="menu-item active" onclick="loadData('day', this)">Day Wise</div>
-    <div class="menu-item" onclick="loadData('month', this)">Month Wise</div>
-    <div class="menu-item" onclick="loadData('scheme', this)">Scheme Wise</div>
+    <div class="menu-item active" onclick="selectMenu(this)">Day Wise</div>
+    <div class="menu-item" onclick="selectMenu(this)">Month Wise</div>
+    <div class="menu-item" onclick="selectMenu(this)">Scheme Wise</div>
   </div>
 
-  <div class="main">
-    <h1>Fleet Dashboard</h1>
-    <div class="note">
-      Source: Google Sheets (Live)
-    </div>
-    <table id="tbl"></table>
+  <div class="main" id="main-content">
+    <!-- Future content will appear here -->
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycby7FZ3r-XR9ADkEh12Q43y3vTnq0wyadGo0FrbzY6TZVuMLaxxZSi4J75QXwg4vemZ27w/exec";
-
-    async function loadData(mode = 'day', el = null) {
-      // Highlight active menu
+    function selectMenu(el) {
+      // Highlight active menu item
       document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
-      if(el) el.classList.add('active');
+      el.classList.add('active');
 
-      const tbl = document.getElementById("tbl");
-      tbl.innerHTML = "<tr><td>Loading...</td></tr>";
-
-      try {
-        const res = await fetch(API_URL);
-        const data = await res.json();
-
-        let rows = [];
-
-        /* ================= DAY WISE ================= */
-        if (mode === "day") {
-          data.forEach(d => {
-            d.records.forEach(r => {
-              rows.push({
-                Date: d.date,
-                Scheme: r.Scheme,
-                CarNumber: r.CarNumber,
-                Driver1: r.SH_Driver1_Name,
-                Trips1: r.SH_Driver1_Trips,
-                Hours1: r.SH_Driver1_Online_Hours,
-                AR1: r.Driver_1_AR + "%",
-                Earning1: r.Total_Earning_Driver_1,
-                Driver2: r.SH_Driver2_Name,
-                Trips2: r.SH_Driver2_Trips,
-                Hours2: r.SH_Driver2_Online_Hours,
-                AR2: r.Driver_2_AR + "%",
-                Earning2: r.Total_Earning_Driver_2
-              });
-            });
-          });
-        }
-
-        /* ================= MONTH WISE ================= */
-        if (mode === "month") {
-          const map = {};
-          data.forEach(d => {
-            const month = d.date.slice(0, 7); // yyyy-mm
-            if (!map[month]) map[month] = 0;
-            d.records.forEach(r => {
-              map[month] += (r.Total_Earning_Driver_1 || 0) + (r.Total_Earning_Driver_2 || 0);
-            });
-          });
-          rows = Object.keys(map).map(m => ({ Month: m, Total_Earning: map[m].toFixed(2) }));
-        }
-
-        /* ================= SCHEME WISE ================= */
-        if (mode === "scheme") {
-          const map = {};
-          data.forEach(d => {
-            d.records.forEach(r => {
-              if (!map[r.Scheme]) map[r.Scheme] = 0;
-              map[r.Scheme] += (r.Total_Earning_Driver_1 || 0) + (r.Total_Earning_Driver_2 || 0);
-            });
-          });
-          rows = Object.keys(map).map(s => ({ Scheme: s, Total_Earning: map[s].toFixed(2) }));
-        }
-
-        renderTable(rows);
-      } catch (err) {
-        tbl.innerHTML = "<tr><td>Error loading data. Check API URL.</td></tr>";
-        console.error(err);
-      }
+      // Placeholder action
+      document.getElementById('main-content').innerHTML = `<h2>${el.textContent} selected</h2>`;
     }
-
-    function renderTable(data) {
-      const tbl = document.getElementById("tbl");
-
-      if (!data.length) {
-        tbl.innerHTML = "<tr><td>No data found</td></tr>";
-        return;
-      }
-
-      const keys = Object.keys(data[0]);
-      let html = "<tr>";
-      keys.forEach(k => html += `<th>${k}</th>`);
-      html += "</tr>";
-
-      data.forEach(row => {
-        html += "<tr>";
-        keys.forEach(k => html += `<td>${row[k]}</td>`);
-        html += "</tr>";
-      });
-
-      tbl.innerHTML = html;
-    }
-
-    // Load default report (Day Wise) on page load
-    window.onload = () => loadData('day');
   </script>
 
 </body>
