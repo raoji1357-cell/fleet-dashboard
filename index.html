@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Fleet Dashboard</title>
+<title>Fleet Day Wise Report</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
@@ -17,143 +17,109 @@ body {
 /* SIDEBAR */
 .sidebar {
   width: 220px;
-  background: linear-gradient(180deg, #111827, #1f2933);
+  background: linear-gradient(180deg,#020617,#0f172a);
   color: #fff;
   padding: 20px;
 }
-
 .sidebar h2 {
   color: #facc15;
   text-align: center;
-  margin-bottom: 30px;
 }
-
 .menu {
+  margin-top: 20px;
   padding: 12px;
-  margin-bottom: 10px;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
 }
-
-.menu.active,
-.menu:hover {
-  background: #374151;
+.menu.active {
+  background: #1e293b;
 }
 
 /* MAIN */
 .main {
   flex: 1;
-  padding: 30px;
-  overflow-y: auto;
+  padding: 40px;
 }
 
-/* FILTER BOX */
-.filter-box {
+/* CARD */
+.card-box {
   background: #fff;
-  padding: 20px;
-  border-radius: 14px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-  max-width: 520px;
-}
-
-.filter-box h1 {
-  margin-top: 0;
+  padding: 30px;
+  border-radius: 20px;
+  max-width: 560px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
 }
 
 label {
   display: block;
-  margin-top: 15px;
+  margin-top: 18px;
   font-weight: 600;
 }
 
 input {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   margin-top: 6px;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid #cbd5e1;
   font-size: 15px;
 }
 
 button {
-  margin-top: 20px;
   width: 100%;
-  padding: 12px;
+  margin-top: 22px;
+  padding: 14px;
   background: #2563eb;
   color: white;
-  border: none;
-  border-radius: 10px;
   font-size: 16px;
+  border: none;
+  border-radius: 14px;
   cursor: pointer;
 }
 
-button:hover {
-  background: #1d4ed8;
-}
-
-/* SUGGESTIONS */
+/* Suggestions */
 .suggestions {
-  background: white;
-  border-radius: 8px;
+  background: #fff;
   border: 1px solid #cbd5e1;
-  margin-top: 5px;
-  max-height: 180px;
+  border-radius: 10px;
+  max-height: 200px;
   overflow-y: auto;
 }
-
 .suggestions div {
   padding: 10px;
   cursor: pointer;
 }
-
 .suggestions div:hover {
   background: #e5e7eb;
 }
 
-/* RESULT CARD */
+/* RESULT */
 .result {
   margin-top: 30px;
 }
-
-.card {
-  background: linear-gradient(135deg, #020617, #1e293b);
+.result-card {
+  background: linear-gradient(135deg,#020617,#1e293b);
   color: white;
-  border-radius: 18px;
   padding: 25px;
+  border-radius: 20px;
   max-width: 620px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
 }
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.card-header h2 {
-  margin: 0;
-}
-
-.metrics {
+.kpis {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 18px;
-  margin-top: 25px;
+  grid-template-columns: repeat(2,1fr);
+  gap: 16px;
+  margin-top: 20px;
 }
-
-.metric {
+.kpi {
   background: rgba(255,255,255,0.08);
-  padding: 16px;
-  border-radius: 12px;
+  padding: 14px;
+  border-radius: 14px;
 }
-
-.metric span {
-  display: block;
+.kpi span {
   font-size: 13px;
   color: #cbd5f5;
 }
-
-.metric strong {
+.kpi strong {
   font-size: 22px;
 }
 </style>
@@ -161,7 +127,6 @@ button:hover {
 
 <body>
 
-<!-- SIDEBAR -->
 <div class="sidebar">
   <h2>📊 Fleet Reports</h2>
   <div class="menu active">Day Wise</div>
@@ -169,15 +134,14 @@ button:hover {
   <div class="menu">Scheme Wise</div>
 </div>
 
-<!-- MAIN -->
 <div class="main">
-  <div class="filter-box">
+  <div class="card-box">
     <h1>Day Wise Report</h1>
 
     <label>Select Date</label>
     <input type="date" id="dateInput">
 
-    <label>Search by Driver Name / Car Number</label>
+    <label>Search Driver / Car Number</label>
     <input type="text" id="searchInput" placeholder="Type name or car number">
     <div class="suggestions" id="suggestions"></div>
 
@@ -188,73 +152,70 @@ button:hover {
 </div>
 
 <script>
-/* 🔗 API URL */
 const API_URL = "PASTE_YOUR_API_URL_HERE";
 
 let apiData = [];
-let uniqueList = [];
+let drivers = [];
 
-/* LOAD DATA */
+/* LOAD API */
 fetch(API_URL)
-  .then(res => res.json())
+  .then(r => r.json())
   .then(data => {
     apiData = data;
 
-    const map = new Map();
+    const seen = new Set();
     data.forEach(d => {
       d.records.forEach(r => {
-        const key = r.SH_Driver1_Name + r.CarNumber;
-        if (!map.has(key)) {
-          map.set(key, {
+        const key = r.SH_Driver1_UUID;
+        if (!seen.has(key)) {
+          seen.add(key);
+          drivers.push({
             name: r.SH_Driver1_Name,
             car: r.CarNumber
           });
         }
       });
     });
-    uniqueList = [...map.values()];
   });
 
 /* SUGGESTIONS */
-const searchInput = document.getElementById("searchInput");
-const suggestions = document.getElementById("suggestions");
+const input = document.getElementById("searchInput");
+const box = document.getElementById("suggestions");
 
-searchInput.addEventListener("input", () => {
-  const q = searchInput.value.toLowerCase();
-  suggestions.innerHTML = "";
-
+input.addEventListener("input", () => {
+  const q = input.value.toLowerCase();
+  box.innerHTML = "";
   if (!q) return;
 
-  uniqueList
-    .filter(x =>
-      x.name.toLowerCase().includes(q) ||
-      x.car.toLowerCase().includes(q)
+  drivers
+    .filter(d =>
+      d.name.toLowerCase().includes(q) ||
+      d.car.toLowerCase().includes(q)
     )
-    .slice(0, 8)
-    .forEach(x => {
+    .slice(0, 10)
+    .forEach(d => {
       const div = document.createElement("div");
-      div.textContent = `${x.name} (${x.car})`;
+      div.textContent = `${d.name} | ${d.car}`;
       div.onclick = () => {
-        searchInput.value = div.textContent;
-        suggestions.innerHTML = "";
+        input.value = div.textContent;
+        box.innerHTML = "";
       };
-      suggestions.appendChild(div);
+      box.appendChild(div);
     });
 });
 
 /* SEARCH */
 function searchReport() {
-  const date = document.getElementById("dateInput").value;
-  const text = searchInput.value;
+  const date = document.getElementById("dateInput").value; // YYYY-MM-DD
+  const text = input.value;
   const result = document.getElementById("result");
 
   if (!date || !text) {
-    alert("Please select Date and Driver / Car Number");
+    alert("Select date and driver");
     return;
   }
 
-  const car = text.match(/\((.*?)\)/)[1];
-  const name = text.replace(/\(.*?\)/, "").trim();
+  const [name, car] = text.split("|").map(x => x.trim());
 
   const day = apiData.find(d => d.date === date);
   if (!day) {
@@ -273,34 +234,15 @@ function searchReport() {
   }
 
   result.innerHTML = `
-    <div class="card">
-      <div class="card-header">
-        <h2>${r.SH_Driver1_Name}</h2>
-        <span>${r.CarNumber}</span>
-      </div>
+    <div class="result-card">
+      <h2>${r.SH_Driver1_Name} <small>(${r.CarNumber})</small></h2>
 
-      <div class="metrics">
-        <div class="metric">
-          <span>Trips</span>
-          <strong>${r.SH_Driver1_Trips}</strong>
-        </div>
-
-        <div class="metric">
-          <span>Online Hours</span>
-          <strong>${r.SH_Driver1_Online_Hours}</strong>
-        </div>
-
-        <div class="metric">
-          <span>Acceptance Rate</span>
-          <strong>${r.Driver_1_AR}%</strong>
-        </div>
-
-        <div class="metric">
-          <span>Cash</span>
-          <strong>₹${r.Cash_Driver_1}</strong>
-        </div>
-
-        <div class="metric" style="grid-column:span 2">
+      <div class="kpis">
+        <div class="kpi"><span>Trips</span><strong>${r.SH_Driver1_Trips}</strong></div>
+        <div class="kpi"><span>Online Hours</span><strong>${r.SH_Driver1_Online_Hours}</strong></div>
+        <div class="kpi"><span>Acceptance Rate</span><strong>${r.Driver_1_AR}%</strong></div>
+        <div class="kpi"><span>Cash</span><strong>₹${r.Cash_Driver_1}</strong></div>
+        <div class="kpi" style="grid-column:span 2">
           <span>Total Earnings</span>
           <strong>₹${r.Total_Earning_Driver_1}</strong>
         </div>
