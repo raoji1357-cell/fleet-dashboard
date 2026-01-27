@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Fleet Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial; margin: 20px; }
+    select, button { padding: 8px; margin: 5px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { border: 1px solid #ccc; padding: 6px; text-align: center; }
+    th { background: #f2f2f2; }
+  </style>
+</head>
+<body>
+
+<h2>🚗 Fleet Dashboard</h2>
+
+<select id="mode">
+  <option value="day">Day Wise</option>
+  <option value="month">Month Wise</option>
+  <option value="scheme">Scheme Wise</option>
+</select>
+
+<button onclick="loadData()">Load Report</button>
+
+<table id="tbl"></table>
+
+<script>
+const API_URL = "PASTE_YOUR_APPS_SCRIPT_URL";
+
+async function loadData() {
+  const res = await fetch(API_URL);
+  const data = await res.json();
+  const mode = document.getElementById("mode").value;
+
+  let rows = [];
+
+  if (mode === "day") {
+    rows = data[0].records;
+  }
+
+  if (mode === "scheme") {
+    const map = {};
+    data.forEach(d => {
+      d.records.forEach(r => {
+        if (!map[r.Scheme]) map[r.Scheme] = 0;
+        map[r.Scheme] += r.Total_Earning_Driver_1 + r.Total_Earning_Driver_2;
+      });
+    });
+    rows = Object.keys(map).map(k => ({
+      Scheme: k,
+      Total_Earning: map[k].toFixed(2)
+    }));
+  }
+
+  renderTable(rows);
+}
+
+function renderTable(data) {
+  if (!data.length) return;
+
+  const tbl = document.getElementById("tbl");
+  tbl.innerHTML = "";
+
+  const keys = Object.keys(data[0]);
+  tbl.innerHTML += "<tr>" + keys.map(k => `<th>${k}</th>`).join("") + "</tr>";
+
+  data.forEach(r => {
+    tbl.innerHTML += "<tr>" + keys.map(k => `<td>${r[k]}</td>`).join("") + "</tr>";
+  });
+}
+</script>
+
+</body>
+</html>
