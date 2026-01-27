@@ -8,22 +8,49 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 20px;
+      margin: 0;
+      display: flex;
+      height: 100vh;
       background: #f8f9fa;
     }
 
-    h2 {
-      margin-bottom: 15px;
+    /* Sidebar */
+    .sidebar {
+      width: 180px;
+      background: #343a40;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      padding-top: 20px;
     }
 
-    select, button {
-      padding: 8px 12px;
-      margin-right: 10px;
-      font-size: 14px;
+    .sidebar h2 {
+      font-size: 16px;
+      text-align: center;
+      margin-bottom: 20px;
+      color: #ffc107;
     }
 
-    button {
+    .menu-item {
+      padding: 12px 16px;
       cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .menu-item:hover, .menu-item.active {
+      background: #495057;
+    }
+
+    /* Main content */
+    .main {
+      flex: 1;
+      padding: 20px;
+      overflow-x: auto;
+    }
+
+    h1 {
+      margin-top: 0;
+      margin-bottom: 15px;
     }
 
     table {
@@ -61,137 +88,118 @@
 
 <body>
 
-<h2>🚗 Fleet Dashboard</h2>
+  <div class="sidebar">
+    <h2>📊 Fleet Reports</h2>
+    <div class="menu-item active" onclick="loadData('day', this)">Day Wise</div>
+    <div class="menu-item" onclick="loadData('month', this)">Month Wise</div>
+    <div class="menu-item" onclick="loadData('scheme', this)">Scheme Wise</div>
+  </div>
 
-<select id="mode">
-  <option value="day">Day Wise</option>
-  <option value="month">Month Wise</option>
-  <option value="scheme">Scheme Wise</option>
-</select>
+  <div class="main">
+    <h1>Fleet Dashboard</h1>
+    <div class="note">
+      Source: Google Sheets (Live)
+    </div>
+    <table id="tbl"></table>
+  </div>
 
-<button onclick="loadData()">Load Report</button>
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycby7FZ3r-XR9ADkEh12Q43y3vTnq0wyadGo0FrbzY6TZVuMLaxxZSi4J75QXwg4vemZ27w/exec";
 
-<div class="note">
-  Source: Google Sheets (Live)
-</div>
+    async function loadData(mode = 'day', el = null) {
+      // Highlight active menu
+      document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+      if(el) el.classList.add('active');
 
-<table id="tbl"></table>
+      const tbl = document.getElementById("tbl");
+      tbl.innerHTML = "<tr><td>Loading...</td></tr>";
 
-<script>
-/* 🔗 GOOGLE APPS SCRIPT API */
-const API_URL =
-  "https://script.google.com/macros/s/AKfycby7FZ3r-XR9ADkEh12Q43y3vTnq0wyadGo0FrbzY6TZVuMLaxxZSi4J75QXwg4vemZ27w/exec";
+      try {
+        const res = await fetch(API_URL);
+        const data = await res.json();
 
-async function loadData() {
-  const tbl = document.getElementById("tbl");
-  tbl.innerHTML = "<tr><td>Loading...</td></tr>";
+        let rows = [];
 
-  try {
-    const res = await fetch(API_URL);
-    const data = await res.json();
-    const mode = document.getElementById("mode").value;
-
-    let rows = [];
-
-    /* ================= DAY WISE ================= */
-    if (mode === "day") {
-      data.forEach(d => {
-        d.records.forEach(r => {
-          rows.push({
-            Date: d.date,
-            Scheme: r.Scheme,
-            CarNumber: r.CarNumber,
-
-            Driver1: r.SH_Driver1_Name,
-            Trips1: r.SH_Driver1_Trips,
-            Hours1: r.SH_Driver1_Online_Hours,
-            AR1: r.Driver_1_AR + "%",
-            Earning1: r.Total_Earning_Driver_1,
-
-            Driver2: r.SH_Driver2_Name,
-            Trips2: r.SH_Driver2_Trips,
-            Hours2: r.SH_Driver2_Online_Hours,
-            AR2: r.Driver_2_AR + "%",
-            Earning2: r.Total_Earning_Driver_2
+        /* ================= DAY WISE ================= */
+        if (mode === "day") {
+          data.forEach(d => {
+            d.records.forEach(r => {
+              rows.push({
+                Date: d.date,
+                Scheme: r.Scheme,
+                CarNumber: r.CarNumber,
+                Driver1: r.SH_Driver1_Name,
+                Trips1: r.SH_Driver1_Trips,
+                Hours1: r.SH_Driver1_Online_Hours,
+                AR1: r.Driver_1_AR + "%",
+                Earning1: r.Total_Earning_Driver_1,
+                Driver2: r.SH_Driver2_Name,
+                Trips2: r.SH_Driver2_Trips,
+                Hours2: r.SH_Driver2_Online_Hours,
+                AR2: r.Driver_2_AR + "%",
+                Earning2: r.Total_Earning_Driver_2
+              });
+            });
           });
-        });
-      });
+        }
+
+        /* ================= MONTH WISE ================= */
+        if (mode === "month") {
+          const map = {};
+          data.forEach(d => {
+            const month = d.date.slice(0, 7); // yyyy-mm
+            if (!map[month]) map[month] = 0;
+            d.records.forEach(r => {
+              map[month] += (r.Total_Earning_Driver_1 || 0) + (r.Total_Earning_Driver_2 || 0);
+            });
+          });
+          rows = Object.keys(map).map(m => ({ Month: m, Total_Earning: map[m].toFixed(2) }));
+        }
+
+        /* ================= SCHEME WISE ================= */
+        if (mode === "scheme") {
+          const map = {};
+          data.forEach(d => {
+            d.records.forEach(r => {
+              if (!map[r.Scheme]) map[r.Scheme] = 0;
+              map[r.Scheme] += (r.Total_Earning_Driver_1 || 0) + (r.Total_Earning_Driver_2 || 0);
+            });
+          });
+          rows = Object.keys(map).map(s => ({ Scheme: s, Total_Earning: map[s].toFixed(2) }));
+        }
+
+        renderTable(rows);
+      } catch (err) {
+        tbl.innerHTML = "<tr><td>Error loading data. Check API URL.</td></tr>";
+        console.error(err);
+      }
     }
 
-    /* ================= MONTH WISE ================= */
-    if (mode === "month") {
-      const map = {};
+    function renderTable(data) {
+      const tbl = document.getElementById("tbl");
 
-      data.forEach(d => {
-        const month = d.date.slice(0, 7); // yyyy-mm
+      if (!data.length) {
+        tbl.innerHTML = "<tr><td>No data found</td></tr>";
+        return;
+      }
 
-        if (!map[month]) map[month] = 0;
+      const keys = Object.keys(data[0]);
+      let html = "<tr>";
+      keys.forEach(k => html += `<th>${k}</th>`);
+      html += "</tr>";
 
-        d.records.forEach(r => {
-          map[month] +=
-            (r.Total_Earning_Driver_1 || 0) +
-            (r.Total_Earning_Driver_2 || 0);
-        });
+      data.forEach(row => {
+        html += "<tr>";
+        keys.forEach(k => html += `<td>${row[k]}</td>`);
+        html += "</tr>";
       });
 
-      rows = Object.keys(map).map(m => ({
-        Month: m,
-        Total_Earning: map[m].toFixed(2)
-      }));
+      tbl.innerHTML = html;
     }
 
-    /* ================= SCHEME WISE ================= */
-    if (mode === "scheme") {
-      const map = {};
-
-      data.forEach(d => {
-        d.records.forEach(r => {
-          if (!map[r.Scheme]) map[r.Scheme] = 0;
-
-          map[r.Scheme] +=
-            (r.Total_Earning_Driver_1 || 0) +
-            (r.Total_Earning_Driver_2 || 0);
-        });
-      });
-
-      rows = Object.keys(map).map(s => ({
-        Scheme: s,
-        Total_Earning: map[s].toFixed(2)
-      }));
-    }
-
-    renderTable(rows);
-
-  } catch (err) {
-    tbl.innerHTML =
-      "<tr><td>Error loading data. Check API URL.</td></tr>";
-    console.error(err);
-  }
-}
-
-function renderTable(data) {
-  const tbl = document.getElementById("tbl");
-
-  if (!data.length) {
-    tbl.innerHTML = "<tr><td>No data found</td></tr>";
-    return;
-  }
-
-  const keys = Object.keys(data[0]);
-
-  let html = "<tr>";
-  keys.forEach(k => html += `<th>${k}</th>`);
-  html += "</tr>";
-
-  data.forEach(row => {
-    html += "<tr>";
-    keys.forEach(k => html += `<td>${row[k]}</td>`);
-    html += "</tr>";
-  });
-
-  tbl.innerHTML = html;
-}
-</script>
+    // Load default report (Day Wise) on page load
+    window.onload = () => loadData('day');
+  </script>
 
 </body>
 </html>
