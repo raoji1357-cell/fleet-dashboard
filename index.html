@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Fleet Day Wise Report</title>
+<title>Fleet Day Wise Report - Debug Version</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
@@ -19,7 +19,6 @@ body {
   display: flex;
 }
 
-/* SIDEBAR */
 .sidebar {
   width: 260px;
   background: linear-gradient(180deg, #020617, #0f172a);
@@ -55,7 +54,6 @@ body {
   box-shadow: 0 4px 15px rgba(37,99,235,0.4);
 }
 
-/* MAIN CONTENT */
 .main {
   flex: 1;
   padding: 40px;
@@ -67,7 +65,6 @@ body {
   margin: 0 auto;
 }
 
-/* CARD */
 .card-box {
   background: #ffffff;
   padding: 40px;
@@ -83,7 +80,6 @@ body {
   font-weight: 700;
 }
 
-/* FORM ELEMENTS */
 .form-group {
   margin-bottom: 24px;
 }
@@ -123,7 +119,6 @@ input:disabled {
   opacity: 0.6;
 }
 
-/* SUGGESTIONS BOX */
 .suggestions {
   background: #fff;
   border: 2px solid #e2e8f0;
@@ -171,7 +166,6 @@ input:disabled {
   border-radius: 6px;
 }
 
-/* BUTTON */
 .btn-search {
   width: 100%;
   padding: 16px;
@@ -188,7 +182,7 @@ input:disabled {
   margin-top: 10px;
 }
 
-.btn-search:hover {
+.btn-search:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 10px 30px rgba(37,99,235,0.4);
 }
@@ -203,21 +197,21 @@ input:disabled {
   transform: none;
 }
 
-/* LOADING STATE */
+/* Loading Spinner */
 .loading {
   text-align: center;
-  padding: 20px;
+  padding: 40px;
   color: #64748b;
 }
 
 .spinner {
-  border: 3px solid #f1f5f9;
-  border-top: 3px solid #2563eb;
+  border: 4px solid #f1f5f9;
+  border-top: 4px solid #2563eb;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   animation: spin 1s linear infinite;
-  margin: 0 auto 10px;
+  margin: 0 auto 20px;
 }
 
 @keyframes spin {
@@ -225,7 +219,45 @@ input:disabled {
   100% { transform: rotate(360deg); }
 }
 
-/* RESULT CARD */
+/* Loading Overlay */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.loading-overlay.show {
+  display: flex;
+}
+
+.loading-content {
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.loading-content .spinner {
+  border-width: 5px;
+  width: 60px;
+  height: 60px;
+}
+
+.loading-content p {
+  margin-top: 20px;
+  font-size: 18px;
+  color: #334155;
+  font-weight: 600;
+}
+
 .result {
   margin-top: 30px;
 }
@@ -273,7 +305,6 @@ input:disabled {
   font-size: 16px;
 }
 
-/* KPI GRID */
 .kpis {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -321,17 +352,28 @@ input:disabled {
   font-size: 36px;
 }
 
-/* ERROR MESSAGE */
 .error-message {
-  background: #fee;
-  color: #c00;
-  padding: 16px;
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 20px;
   border-radius: 12px;
   margin-top: 20px;
-  border-left: 4px solid #c00;
+  border-left: 4px solid #dc2626;
+  box-shadow: 0 4px 12px rgba(220,38,38,0.1);
 }
 
-/* EMPTY STATE */
+.error-message strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.error-details {
+  font-size: 14px;
+  margin-top: 8px;
+  opacity: 0.8;
+}
+
 .empty-state {
   text-align: center;
   padding: 60px 40px;
@@ -345,7 +387,41 @@ input:disabled {
   opacity: 0.5;
 }
 
-/* RESPONSIVE */
+/* Debug Console */
+.debug-console {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(0,0,0,0.9);
+  color: #0f0;
+  padding: 15px;
+  border-radius: 10px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  max-width: 400px;
+  max-height: 300px;
+  overflow-y: auto;
+  display: none;
+  z-index: 1000;
+}
+
+.debug-console.show {
+  display: block;
+}
+
+.debug-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #2563eb;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  z-index: 999;
+}
+
 @media (max-width: 768px) {
   body {
     flex-direction: column;
@@ -376,6 +452,14 @@ input:disabled {
 </head>
 
 <body>
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-content">
+    <div class="spinner"></div>
+    <p id="loadingText">Loading data...</p>
+  </div>
+</div>
+
 <div class="sidebar">
   <h2>📊 Fleet Reports</h2>
   <div class="menu active">📅 Day Wise</div>
@@ -414,18 +498,138 @@ input:disabled {
   </div>
 </div>
 
+<!-- Debug Toggle -->
+<div class="debug-toggle" id="debugToggle">🐛 Debug</div>
+
+<!-- Debug Console -->
+<div class="debug-console" id="debugConsole">
+  <div id="debugLog">Debug logs will appear here...</div>
+</div>
+
 <script>
+// ========================================
+// DEBUG LOGGER
+// ========================================
+const DebugLogger = {
+  enabled: false,
+  logs: [],
+  
+  log(message, type = 'info') {
+    const timestamp = new Date().toLocaleTimeString();
+    const logEntry = `[${timestamp}] ${message}`;
+    
+    console.log(logEntry);
+    this.logs.push(logEntry);
+    
+    if (this.enabled) {
+      const debugLog = document.getElementById('debugLog');
+      debugLog.innerHTML = this.logs.slice(-20).join('<br>');
+      debugLog.scrollTop = debugLog.scrollHeight;
+    }
+  },
+  
+  clear() {
+    this.logs = [];
+    const debugLog = document.getElementById('debugLog');
+    if (debugLog) debugLog.innerHTML = 'Logs cleared...';
+  }
+};
+
+// Toggle debug console
+document.getElementById('debugToggle').addEventListener('click', () => {
+  DebugLogger.enabled = !DebugLogger.enabled;
+  const console = document.getElementById('debugConsole');
+  const toggle = document.getElementById('debugToggle');
+  
+  if (DebugLogger.enabled) {
+    console.classList.add('show');
+    toggle.textContent = '❌ Close';
+  } else {
+    console.classList.remove('show');
+    toggle.textContent = '🐛 Debug';
+  }
+});
+
 // ========================================
 // CONFIGURATION
 // ========================================
 const CONFIG = {
-  API_URL: "https://script.google.com/macros/s/AKfycbwp4hJIRLXHeJWmewoNMZnO3HFoi0qnhSaIeOBpPiD73jTKYLl8yYR1XkdF-ObAkZhLAw/exec",
+  API_URL: "https://script.google.com/macros/s/AKfycbwWfkVQTkInEHFs1njWFw2oKhPFkI4fIqKIc1JTvft69lAeW_C9MVaJU5ZYtan-lCKmsQ/exec",
   MAX_SUGGESTIONS: 10,
-  DEBOUNCE_DELAY: 300
+  DEBOUNCE_DELAY: 300,
+  CACHE_DURATION: 5 * 60 * 1000,
+  USE_LOCAL_CACHE: true,
+  API_TIMEOUT: 30000 // 30 seconds timeout
 };
 
 // ========================================
-// STATE MANAGEMENT
+// LOCAL CACHE
+// ========================================
+const LocalCache = {
+  set(key, data) {
+    if (!CONFIG.USE_LOCAL_CACHE) return;
+    
+    const cacheData = {
+      data: data,
+      timestamp: Date.now()
+    };
+    
+    try {
+      localStorage.setItem(`fleet_${key}`, JSON.stringify(cacheData));
+      DebugLogger.log(`💾 Cached: ${key}`);
+    } catch (e) {
+      DebugLogger.log(`⚠️ Cache storage failed: ${e.message}`);
+    }
+  },
+
+  get(key) {
+    if (!CONFIG.USE_LOCAL_CACHE) return null;
+    
+    try {
+      const cached = localStorage.getItem(`fleet_${key}`);
+      if (!cached) return null;
+      
+      const cacheData = JSON.parse(cached);
+      const age = Date.now() - cacheData.timestamp;
+      
+      if (age < CONFIG.CACHE_DURATION) {
+        DebugLogger.log(`✅ Cache hit: ${key} (age: ${Math.round(age/1000)}s)`);
+        return cacheData.data;
+      } else {
+        DebugLogger.log(`❌ Cache expired: ${key}`);
+        this.remove(key);
+        return null;
+      }
+    } catch (e) {
+      DebugLogger.log(`⚠️ Cache retrieval failed: ${e.message}`);
+      return null;
+    }
+  },
+
+  remove(key) {
+    try {
+      localStorage.removeItem(`fleet_${key}`);
+    } catch (e) {
+      DebugLogger.log(`⚠️ Cache removal failed: ${e.message}`);
+    }
+  },
+
+  clear() {
+    try {
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('fleet_')) {
+          localStorage.removeItem(key);
+        }
+      });
+      DebugLogger.log("🗑️ Cache cleared");
+    } catch (e) {
+      DebugLogger.log(`⚠️ Cache clear failed: ${e.message}`);
+    }
+  }
+};
+
+// ========================================
+// STATE
 // ========================================
 const AppState = {
   apiData: [],
@@ -443,7 +647,9 @@ const DOM = {
   searchInput: document.getElementById("searchInput"),
   suggestionsBox: document.getElementById("suggestions"),
   searchBtn: document.getElementById("searchBtn"),
-  result: document.getElementById("result")
+  result: document.getElementById("result"),
+  loadingOverlay: document.getElementById("loadingOverlay"),
+  loadingText: document.getElementById("loadingText")
 };
 
 // ========================================
@@ -458,15 +664,6 @@ const Utils = {
     }).format(amount);
   },
 
-  formatDate: (dateStr) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-IN', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric'
-    });
-  },
-
   debounce: (func, wait) => {
     let timeout;
     return function executedFunction(...args) {
@@ -479,21 +676,28 @@ const Utils = {
     };
   },
 
-  showLoading: () => {
-    DOM.result.innerHTML = `
-      <div class="loading">
-        <div class="spinner"></div>
-        <p>Loading data...</p>
-      </div>
-    `;
+  showLoading: (message = 'Loading data...') => {
+    DOM.loadingText.textContent = message;
+    DOM.loadingOverlay.classList.add('show');
+    AppState.isLoading = true;
+    DebugLogger.log(`⏳ Loading: ${message}`);
   },
 
-  showError: (message) => {
+  hideLoading: () => {
+    DOM.loadingOverlay.classList.remove('show');
+    AppState.isLoading = false;
+    DebugLogger.log('✅ Loading complete');
+  },
+
+  showError: (message, details = '') => {
     DOM.result.innerHTML = `
       <div class="error-message">
-        <strong>⚠️ Error:</strong> ${message}
+        <strong>⚠️ Error</strong>
+        <div>${message}</div>
+        ${details ? `<div class="error-details">${details}</div>` : ''}
       </div>
     `;
+    DebugLogger.log(`❌ Error: ${message}`);
   },
 
   showEmpty: (message) => {
@@ -512,25 +716,81 @@ const Utils = {
 // API FUNCTIONS
 // ========================================
 const API = {
-  async fetchData() {
+  async fetchData(forceRefresh = false) {
+    const cacheKey = 'all_data';
+    
+    // Try cache first
+    if (!forceRefresh) {
+      const cachedData = LocalCache.get(cacheKey);
+      if (cachedData) {
+        AppState.apiData = cachedData;
+        DOM.result.innerHTML = "";
+        return true;
+      }
+    }
+    
+    // Fetch from API
     try {
-      Utils.showLoading();
-      const response = await fetch(CONFIG.API_URL);
+      Utils.showLoading('Fetching data from server...');
+      DebugLogger.log(`🌐 Fetching from: ${CONFIG.API_URL}`);
+      
+      const startTime = Date.now();
+      
+      // Create abort controller for timeout
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), CONFIG.API_TIMEOUT);
+      
+      const response = await fetch(CONFIG.API_URL, {
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeout);
+      
+      const loadTime = Date.now() - startTime;
+      DebugLogger.log(`📊 Response received in ${loadTime}ms`);
       
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       
+      const contentType = response.headers.get('content-type');
+      DebugLogger.log(`📄 Content-Type: ${contentType}`);
+      
       const data = await response.json();
+      DebugLogger.log(`✅ Data parsed successfully`);
+      DebugLogger.log(`📊 Records found: ${Array.isArray(data) ? data.length : 1}`);
+      
       AppState.apiData = Array.isArray(data) ? data : [data];
       
-      console.log("✅ API Data Loaded:", AppState.apiData.length, "records");
+      // Cache it
+      LocalCache.set(cacheKey, AppState.apiData);
+      
+      Utils.hideLoading();
       DOM.result.innerHTML = "";
       
       return true;
+      
     } catch (error) {
-      console.error("❌ API Error:", error);
-      Utils.showError("Failed to load data. Please check your internet connection and try again.");
+      Utils.hideLoading();
+      
+      let errorMessage = "Failed to load data";
+      let errorDetails = "";
+      
+      if (error.name === 'AbortError') {
+        errorMessage = "Request timed out";
+        errorDetails = "The server took too long to respond. Please try again.";
+        DebugLogger.log(`⏱️ Request timeout after ${CONFIG.API_TIMEOUT}ms`);
+      } else if (error.message.includes('HTTP')) {
+        errorMessage = "Server error";
+        errorDetails = error.message;
+        DebugLogger.log(`🚫 ${error.message}`);
+      } else {
+        errorMessage = "Network error";
+        errorDetails = "Check your internet connection and try again.";
+        DebugLogger.log(`🔌 Network error: ${error.message}`);
+      }
+      
+      Utils.showError(errorMessage, errorDetails);
       return false;
     }
   }
@@ -541,6 +801,8 @@ const API = {
 // ========================================
 const DriverManager = {
   loadDriversForDate(date) {
+    DebugLogger.log(`📅 Loading drivers for: ${date}`);
+    
     AppState.driversIndex = [];
     AppState.selectedDate = date;
     
@@ -549,7 +811,7 @@ const DriverManager = {
     );
 
     if (!dayData || !Array.isArray(dayData.records)) {
-      console.warn("No records found for date:", date);
+      DebugLogger.log(`⚠️ No records found for date: ${date}`);
       return [];
     }
 
@@ -584,7 +846,7 @@ const DriverManager = {
     });
 
     AppState.driversIndex = Array.from(uniqueDrivers.values());
-    console.log(`📋 Loaded ${AppState.driversIndex.length} unique drivers for ${date}`);
+    DebugLogger.log(`✅ Loaded ${AppState.driversIndex.length} unique drivers`);
     
     return AppState.driversIndex;
   },
@@ -627,6 +889,7 @@ const UI = {
         AppState.selectedDriver = driver;
         DOM.suggestionsBox.classList.remove("show");
         DOM.searchBtn.disabled = false;
+        DebugLogger.log(`✅ Selected: ${driver.name} | ${driver.car}`);
       };
       
       DOM.suggestionsBox.appendChild(div);
@@ -679,6 +942,8 @@ const UI = {
         </div>
       </div>
     `;
+    
+    DebugLogger.log(`✅ Results displayed for ${driver.name}`);
   }
 };
 
@@ -688,6 +953,7 @@ const UI = {
 const EventHandlers = {
   onDateChange() {
     const date = DOM.dateInput.value;
+    DebugLogger.log(`📅 Date changed: ${date}`);
     
     // Reset UI
     DOM.searchInput.value = "";
@@ -698,7 +964,10 @@ const EventHandlers = {
     DOM.result.innerHTML = "";
     AppState.selectedDriver = null;
 
-    if (!date) return;
+    if (!date) {
+      DebugLogger.log('⚠️ No date selected');
+      return;
+    }
 
     const drivers = DriverManager.loadDriversForDate(date);
     
@@ -730,6 +999,8 @@ const EventHandlers = {
       alert("⚠️ Please select a date and choose a driver from suggestions.");
       return;
     }
+
+    DebugLogger.log(`🔍 Searching for: ${AppState.selectedDriver.name}`);
 
     const dayData = AppState.apiData.find(d => 
       String(d.date).trim() === String(AppState.selectedDate).trim()
@@ -763,17 +1034,20 @@ const EventHandlers = {
 // INITIALIZATION
 // ========================================
 async function init() {
-  console.log("🚀 Initializing Fleet Report System...");
+  DebugLogger.log("🚀 Initializing Fleet Report System...");
+  DebugLogger.log(`API URL: ${CONFIG.API_URL}`);
   
   // Set max date to today
   const today = new Date().toISOString().split('T')[0];
   DOM.dateInput.max = today;
+  DebugLogger.log(`📅 Max date set to: ${today}`);
 
   // Load API data
   const success = await API.fetchData();
   
   if (!success) {
     DOM.dateInput.disabled = true;
+    DebugLogger.log('❌ Initialization failed');
     return;
   }
 
@@ -789,7 +1063,16 @@ async function init() {
     }
   });
 
-  console.log("✅ System Ready!");
+  // Add global refresh function
+  window.refreshData = async () => {
+    LocalCache.clear();
+    await API.fetchData(true);
+    alert("✅ Data refreshed!");
+  };
+
+  DebugLogger.log("✅ System Ready!");
+  console.log("💡 Debug console available - click 🐛 Debug button");
+  console.log("💡 Call refreshData() to clear cache and reload");
 }
 
 // Start the application
