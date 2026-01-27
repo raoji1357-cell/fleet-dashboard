@@ -6,251 +6,794 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body {
+* {
+  box-sizing: border-box;
   margin: 0;
-  font-family: "Segoe UI", sans-serif;
-  background: #f1f5f9;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
   display: flex;
-  height: 100vh;
 }
 
 /* SIDEBAR */
 .sidebar {
-  width: 220px;
-  background: linear-gradient(180deg,#020617,#0f172a);
+  width: 260px;
+  background: linear-gradient(180deg, #020617, #0f172a);
   color: #fff;
-  padding: 20px;
+  padding: 30px 20px;
+  box-shadow: 4px 0 20px rgba(0,0,0,0.3);
 }
+
 .sidebar h2 {
   color: #facc15;
   text-align: center;
-}
-.menu {
-  margin-top: 20px;
-  padding: 12px;
-  border-radius: 10px;
-  cursor: pointer;
-}
-.menu.active {
-  background: #1e293b;
+  font-size: 24px;
+  margin-bottom: 40px;
+  letter-spacing: 1px;
 }
 
-/* MAIN */
+.menu {
+  margin-bottom: 12px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.menu:hover {
+  background: rgba(255,255,255,0.1);
+  transform: translateX(5px);
+}
+
+.menu.active {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  box-shadow: 0 4px 15px rgba(37,99,235,0.4);
+}
+
+/* MAIN CONTENT */
 .main {
   flex: 1;
   padding: 40px;
+  overflow-y: auto;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 /* CARD */
 .card-box {
-  background: #fff;
-  padding: 30px;
-  border-radius: 20px;
-  max-width: 560px;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  margin-bottom: 30px;
+}
+
+.card-box h1 {
+  color: #1e293b;
+  font-size: 32px;
+  margin-bottom: 30px;
+  font-weight: 700;
+}
+
+/* FORM ELEMENTS */
+.form-group {
+  margin-bottom: 24px;
 }
 
 label {
   display: block;
-  margin-top: 18px;
+  margin-bottom: 8px;
   font-weight: 600;
+  color: #334155;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-input {
+input[type="date"],
+input[type="text"] {
   width: 100%;
-  padding: 12px;
-  margin-top: 6px;
-  border-radius: 10px;
-  border: 1px solid #cbd5e1;
-  font-size: 15px;
-}
-
-button {
-  width: 100%;
-  margin-top: 22px;
-  padding: 14px;
-  background: #2563eb;
-  color: white;
+  padding: 14px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
   font-size: 16px;
-  border: none;
-  border-radius: 14px;
-  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #f8fafc;
 }
 
-/* Suggestions */
+input[type="date"]:focus,
+input[type="text"]:focus {
+  outline: none;
+  border-color: #2563eb;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(37,99,235,0.1);
+}
+
+input:disabled {
+  background: #e2e8f0;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* SUGGESTIONS BOX */
 .suggestions {
   background: #fff;
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
-  max-height: 200px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  max-height: 280px;
   overflow-y: auto;
-}
-.suggestions div {
-  padding: 10px;
-  cursor: pointer;
-}
-.suggestions div:hover {
-  background: #e5e7eb;
+  margin-top: 8px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  display: none;
 }
 
-/* RESULT */
+.suggestions.show {
+  display: block;
+}
+
+.suggestions div {
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.suggestions div:last-child {
+  border-bottom: none;
+}
+
+.suggestions div:hover {
+  background: linear-gradient(90deg, #eff6ff, #dbeafe);
+  transform: translateX(4px);
+}
+
+.suggestion-name {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.suggestion-car {
+  color: #64748b;
+  font-size: 14px;
+  background: #f1f5f9;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+/* BUTTON */
+.btn-search {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 10px;
+}
+
+.btn-search:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(37,99,235,0.4);
+}
+
+.btn-search:active {
+  transform: translateY(0);
+}
+
+.btn-search:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* LOADING STATE */
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #64748b;
+}
+
+.spinner {
+  border: 3px solid #f1f5f9;
+  border-top: 3px solid #2563eb;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* RESULT CARD */
 .result {
   margin-top: 30px;
 }
+
 .result-card {
-  background: linear-gradient(135deg,#020617,#1e293b);
-  color: white;
-  padding: 25px;
-  border-radius: 20px;
-  max-width: 620px;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  color: #fff;
+  padding: 40px;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  animation: fadeIn 0.5s ease;
 }
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid rgba(255,255,255,0.1);
+}
+
+.result-header h2 {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.result-car {
+  background: rgba(250,204,21,0.2);
+  color: #facc15;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+/* KPI GRID */
 .kpis {
   display: grid;
-  grid-template-columns: repeat(2,1fr);
-  gap: 16px;
-  margin-top: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
 }
+
 .kpi {
   background: rgba(255,255,255,0.08);
-  padding: 14px;
-  border-radius: 14px;
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: all 0.3s ease;
 }
-.kpi span {
+
+.kpi:hover {
+  background: rgba(255,255,255,0.12);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.kpi-label {
   font-size: 13px;
-  color: #cbd5f5;
+  color: #cbd5e1;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  display: block;
 }
-.kpi strong {
-  font-size: 22px;
+
+.kpi-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: #fff;
+  display: block;
+}
+
+.kpi-earnings {
+  grid-column: span 2;
+  background: linear-gradient(135deg, rgba(34,197,94,0.2), rgba(22,163,74,0.2));
+  border: 1px solid rgba(34,197,94,0.3);
+}
+
+.kpi-earnings .kpi-value {
+  color: #4ade80;
+  font-size: 36px;
+}
+
+/* ERROR MESSAGE */
+.error-message {
+  background: #fee;
+  color: #c00;
+  padding: 16px;
+  border-radius: 12px;
+  margin-top: 20px;
+  border-left: 4px solid #c00;
+}
+
+/* EMPTY STATE */
+.empty-state {
+  text-align: center;
+  padding: 60px 40px;
+  color: #64748b;
+}
+
+.empty-state svg {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  body {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+    padding: 20px;
+  }
+  
+  .main {
+    padding: 20px;
+  }
+  
+  .card-box {
+    padding: 24px;
+  }
+  
+  .kpis {
+    grid-template-columns: 1fr;
+  }
+  
+  .kpi-earnings {
+    grid-column: span 1;
+  }
 }
 </style>
 </head>
 
 <body>
-
 <div class="sidebar">
   <h2>📊 Fleet Reports</h2>
-  <div class="menu active">Day Wise</div>
-  <div class="menu">Month Wise</div>
-  <div class="menu">Scheme Wise</div>
+  <div class="menu active">📅 Day Wise</div>
+  <div class="menu">📆 Month Wise</div>
+  <div class="menu">💼 Scheme Wise</div>
 </div>
 
 <div class="main">
-  <div class="card-box">
-    <h1>Day Wise Report</h1>
+  <div class="container">
+    <div class="card-box">
+      <h1>📋 Day Wise Report</h1>
 
-    <label>Select Date</label>
-    <input type="date" id="dateInput">
+      <div class="form-group">
+        <label for="dateInput">Select Date</label>
+        <input type="date" id="dateInput" max="">
+      </div>
 
-    <label>Search Driver / Car Number</label>
-    <input type="text" id="searchInput" placeholder="Type name or car number">
-    <div class="suggestions" id="suggestions"></div>
+      <div class="form-group">
+        <label for="searchInput">Search Driver / Car Number</label>
+        <input 
+          type="text" 
+          id="searchInput" 
+          placeholder="Type driver name or car number..." 
+          disabled
+          autocomplete="off"
+        >
+        <div class="suggestions" id="suggestions"></div>
+      </div>
 
-    <button onclick="searchReport()">Search</button>
+      <button class="btn-search" id="searchBtn" disabled>
+        🔍 Search Records
+      </button>
+    </div>
+
+    <div class="result" id="result"></div>
   </div>
-
-  <div class="result" id="result"></div>
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbwWfkVQTkInEHFs1njWFw2oKhPFkI4fIqKIc1JTvft69lAeW_C9MVaJU5ZYtan-lCKmsQ/exec";
+// ========================================
+// CONFIGURATION
+// ========================================
+const CONFIG = {
+  API_URL: "https://script.google.com/macros/s/AKfycbwWfkVQTkInEHFs1njWFw2oKhPFkI4fIqKIc1JTvft69lAeW_C9MVaJU5ZYtan-lCKmsQ/exec",
+  MAX_SUGGESTIONS: 10,
+  DEBOUNCE_DELAY: 300
+};
 
-let apiData = [];
-let drivers = [];
+// ========================================
+// STATE MANAGEMENT
+// ========================================
+const AppState = {
+  apiData: [],
+  driversIndex: [],
+  selectedDate: null,
+  selectedDriver: null,
+  isLoading: false
+};
 
-/* LOAD API */
-fetch(API_URL)
-  .then(r => r.json())
-  .then(data => {
-    apiData = data;
+// ========================================
+// DOM ELEMENTS
+// ========================================
+const DOM = {
+  dateInput: document.getElementById("dateInput"),
+  searchInput: document.getElementById("searchInput"),
+  suggestionsBox: document.getElementById("suggestions"),
+  searchBtn: document.getElementById("searchBtn"),
+  result: document.getElementById("result")
+};
 
-    const seen = new Set();
-    data.forEach(d => {
-      d.records.forEach(r => {
-        const key = r.SH_Driver1_UUID;
-        if (!seen.has(key)) {
-          seen.add(key);
-          drivers.push({
-            name: r.SH_Driver1_Name,
-            car: r.CarNumber
+// ========================================
+// UTILITY FUNCTIONS
+// ========================================
+const Utils = {
+  formatCurrency: (amount) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 2
+    }).format(amount);
+  },
+
+  formatDate: (dateStr) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
+  },
+
+  debounce: (func, wait) => {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  },
+
+  showLoading: () => {
+    DOM.result.innerHTML = `
+      <div class="loading">
+        <div class="spinner"></div>
+        <p>Loading data...</p>
+      </div>
+    `;
+  },
+
+  showError: (message) => {
+    DOM.result.innerHTML = `
+      <div class="error-message">
+        <strong>⚠️ Error:</strong> ${message}
+      </div>
+    `;
+  },
+
+  showEmpty: (message) => {
+    DOM.result.innerHTML = `
+      <div class="empty-state">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <h3>${message}</h3>
+      </div>
+    `;
+  }
+};
+
+// ========================================
+// API FUNCTIONS
+// ========================================
+const API = {
+  async fetchData() {
+    try {
+      Utils.showLoading();
+      const response = await fetch(CONFIG.API_URL);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      AppState.apiData = Array.isArray(data) ? data : [data];
+      
+      console.log("✅ API Data Loaded:", AppState.apiData.length, "records");
+      DOM.result.innerHTML = "";
+      
+      return true;
+    } catch (error) {
+      console.error("❌ API Error:", error);
+      Utils.showError("Failed to load data. Please check your internet connection and try again.");
+      return false;
+    }
+  }
+};
+
+// ========================================
+// DRIVER FUNCTIONS
+// ========================================
+const DriverManager = {
+  loadDriversForDate(date) {
+    AppState.driversIndex = [];
+    AppState.selectedDate = date;
+    
+    const dayData = AppState.apiData.find(d => 
+      String(d.date).trim() === String(date).trim()
+    );
+
+    if (!dayData || !Array.isArray(dayData.records)) {
+      console.warn("No records found for date:", date);
+      return [];
+    }
+
+    const uniqueDrivers = new Map();
+    
+    dayData.records.forEach(record => {
+      // Driver 1
+      if (record.SH_Driver1_UUID && record.SH_Driver1_Name) {
+        const key = `${record.SH_Driver1_UUID}_${record.CarNumber}`;
+        if (!uniqueDrivers.has(key)) {
+          uniqueDrivers.set(key, {
+            uuid: record.SH_Driver1_UUID,
+            name: record.SH_Driver1_Name.trim(),
+            car: record.CarNumber.trim(),
+            type: 'driver1'
           });
         }
-      });
+      }
+      
+      // Driver 2
+      if (record.SH_Driver2_UUID && record.SH_Driver2_Name) {
+        const key = `${record.SH_Driver2_UUID}_${record.CarNumber}`;
+        if (!uniqueDrivers.has(key)) {
+          uniqueDrivers.set(key, {
+            uuid: record.SH_Driver2_UUID,
+            name: record.SH_Driver2_Name.trim(),
+            car: record.CarNumber.trim(),
+            type: 'driver2'
+          });
+        }
+      }
     });
-  });
 
-/* SUGGESTIONS */
-const input = document.getElementById("searchInput");
-const box = document.getElementById("suggestions");
+    AppState.driversIndex = Array.from(uniqueDrivers.values());
+    console.log(`📋 Loaded ${AppState.driversIndex.length} unique drivers for ${date}`);
+    
+    return AppState.driversIndex;
+  },
 
-input.addEventListener("input", () => {
-  const q = input.value.toLowerCase();
-  box.innerHTML = "";
-  if (!q) return;
+  filterDrivers(query) {
+    if (!query) return [];
+    
+    const lowerQuery = query.toLowerCase();
+    
+    return AppState.driversIndex
+      .filter(driver => 
+        driver.name.toLowerCase().includes(lowerQuery) || 
+        driver.car.toLowerCase().includes(lowerQuery)
+      )
+      .slice(0, CONFIG.MAX_SUGGESTIONS);
+  }
+};
 
-  drivers
-    .filter(d =>
-      d.name.toLowerCase().includes(q) ||
-      d.car.toLowerCase().includes(q)
-    )
-    .slice(0, 10)
-    .forEach(d => {
+// ========================================
+// UI FUNCTIONS
+// ========================================
+const UI = {
+  updateSuggestions(drivers) {
+    DOM.suggestionsBox.innerHTML = "";
+    
+    if (drivers.length === 0) {
+      DOM.suggestionsBox.classList.remove("show");
+      return;
+    }
+
+    drivers.forEach(driver => {
       const div = document.createElement("div");
-      div.textContent = `${d.name} | ${d.car}`;
+      div.innerHTML = `
+        <span class="suggestion-name">${driver.name}</span>
+        <span class="suggestion-car">${driver.car}</span>
+      `;
+      
       div.onclick = () => {
-        input.value = div.textContent;
-        box.innerHTML = "";
+        DOM.searchInput.value = `${driver.name} | ${driver.car}`;
+        AppState.selectedDriver = driver;
+        DOM.suggestionsBox.classList.remove("show");
+        DOM.searchBtn.disabled = false;
       };
-      box.appendChild(div);
+      
+      DOM.suggestionsBox.appendChild(div);
     });
-});
 
-/* SEARCH */
-function searchReport() {
-  const date = document.getElementById("dateInput").value; // YYYY-MM-DD
-  const text = input.value;
-  const result = document.getElementById("result");
+    DOM.suggestionsBox.classList.add("show");
+  },
 
-  if (!date || !text) {
-    alert("Select date and driver");
-    return;
-  }
+  displayResults(record, driver) {
+    const isDriver1 = driver.type === 'driver1';
+    
+    const trips = isDriver1 ? record.SH_Driver1_Trips : record.SH_Driver2_Trips;
+    const onlineHours = isDriver1 ? record.SH_Driver1_Online_Hours : record.SH_Driver2_Online_Hours;
+    const ar = isDriver1 ? record.Driver_1_AR : record.Driver_2_AR;
+    const cash = isDriver1 ? record.Cash_Driver_1 : record.Cash_Driver_2;
+    const earnings = isDriver1 ? record.Total_Earning_Driver_1 : record.Total_Earning_Driver_2;
 
-  const [name, car] = text.split("|").map(x => x.trim());
-
-  const day = apiData.find(d => d.date === date);
-  if (!day) {
-    result.innerHTML = "<p>No data for selected date</p>";
-    return;
-  }
-
-  const r = day.records.find(x =>
-    x.SH_Driver1_Name === name &&
-    x.CarNumber === car
-  );
-
-  if (!r) {
-    result.innerHTML = "<p>No matching record found</p>";
-    return;
-  }
-
-  result.innerHTML = `
-    <div class="result-card">
-      <h2>${r.SH_Driver1_Name} <small>(${r.CarNumber})</small></h2>
-
-      <div class="kpis">
-        <div class="kpi"><span>Trips</span><strong>${r.SH_Driver1_Trips}</strong></div>
-        <div class="kpi"><span>Online Hours</span><strong>${r.SH_Driver1_Online_Hours}</strong></div>
-        <div class="kpi"><span>Acceptance Rate</span><strong>${r.Driver_1_AR}%</strong></div>
-        <div class="kpi"><span>Cash</span><strong>₹${r.Cash_Driver_1}</strong></div>
-        <div class="kpi" style="grid-column:span 2">
-          <span>Total Earnings</span>
-          <strong>₹${r.Total_Earning_Driver_1}</strong>
+    DOM.result.innerHTML = `
+      <div class="result-card">
+        <div class="result-header">
+          <h2>${driver.name}</h2>
+          <div class="result-car">${driver.car}</div>
+        </div>
+        
+        <div class="kpis">
+          <div class="kpi">
+            <span class="kpi-label">🚗 Trips</span>
+            <span class="kpi-value">${trips || 0}</span>
+          </div>
+          
+          <div class="kpi">
+            <span class="kpi-label">⏱️ Online Hours</span>
+            <span class="kpi-value">${(onlineHours || 0).toFixed(2)}</span>
+          </div>
+          
+          <div class="kpi">
+            <span class="kpi-label">✅ Acceptance Rate</span>
+            <span class="kpi-value">${ar || 0}%</span>
+          </div>
+          
+          <div class="kpi">
+            <span class="kpi-label">💵 Cash</span>
+            <span class="kpi-value">${Utils.formatCurrency(cash || 0)}</span>
+          </div>
+          
+          <div class="kpi kpi-earnings">
+            <span class="kpi-label">💰 Total Earnings</span>
+            <span class="kpi-value">${Utils.formatCurrency(earnings || 0)}</span>
+          </div>
         </div>
       </div>
-    </div>
-  `;
-}
-</script>
+    `;
+  }
+};
 
+// ========================================
+// EVENT HANDLERS
+// ========================================
+const EventHandlers = {
+  onDateChange() {
+    const date = DOM.dateInput.value;
+    
+    // Reset UI
+    DOM.searchInput.value = "";
+    DOM.searchInput.disabled = true;
+    DOM.searchBtn.disabled = true;
+    DOM.suggestionsBox.innerHTML = "";
+    DOM.suggestionsBox.classList.remove("show");
+    DOM.result.innerHTML = "";
+    AppState.selectedDriver = null;
+
+    if (!date) return;
+
+    const drivers = DriverManager.loadDriversForDate(date);
+    
+    if (drivers.length === 0) {
+      Utils.showEmpty("No drivers found for the selected date.");
+      return;
+    }
+
+    DOM.searchInput.disabled = false;
+    DOM.searchInput.placeholder = `Search from ${drivers.length} drivers...`;
+  },
+
+  onSearchInput: Utils.debounce(() => {
+    const query = DOM.searchInput.value.trim();
+    
+    if (!query) {
+      DOM.suggestionsBox.classList.remove("show");
+      DOM.searchBtn.disabled = true;
+      AppState.selectedDriver = null;
+      return;
+    }
+
+    const filtered = DriverManager.filterDrivers(query);
+    UI.updateSuggestions(filtered);
+  }, CONFIG.DEBOUNCE_DELAY),
+
+  onSearch() {
+    if (!AppState.selectedDate || !AppState.selectedDriver) {
+      alert("⚠️ Please select a date and choose a driver from suggestions.");
+      return;
+    }
+
+    const dayData = AppState.apiData.find(d => 
+      String(d.date).trim() === String(AppState.selectedDate).trim()
+    );
+
+    if (!dayData) {
+      Utils.showError("No data found for the selected date.");
+      return;
+    }
+
+    const record = dayData.records.find(r => {
+      if (AppState.selectedDriver.type === 'driver1') {
+        return r.SH_Driver1_UUID === AppState.selectedDriver.uuid && 
+               r.CarNumber === AppState.selectedDriver.car;
+      } else {
+        return r.SH_Driver2_UUID === AppState.selectedDriver.uuid && 
+               r.CarNumber === AppState.selectedDriver.car;
+      }
+    });
+
+    if (!record) {
+      Utils.showError("No matching record found for this driver.");
+      return;
+    }
+
+    UI.displayResults(record, AppState.selectedDriver);
+  }
+};
+
+// ========================================
+// INITIALIZATION
+// ========================================
+async function init() {
+  console.log("🚀 Initializing Fleet Report System...");
+  
+  // Set max date to today
+  const today = new Date().toISOString().split('T')[0];
+  DOM.dateInput.max = today;
+
+  // Load API data
+  const success = await API.fetchData();
+  
+  if (!success) {
+    DOM.dateInput.disabled = true;
+    return;
+  }
+
+  // Attach event listeners
+  DOM.dateInput.addEventListener("change", EventHandlers.onDateChange);
+  DOM.searchInput.addEventListener("input", EventHandlers.onSearchInput);
+  DOM.searchBtn.addEventListener("click", EventHandlers.onSearch);
+
+  // Close suggestions on outside click
+  document.addEventListener("click", (e) => {
+    if (!DOM.searchInput.contains(e.target) && !DOM.suggestionsBox.contains(e.target)) {
+      DOM.suggestionsBox.classList.remove("show");
+    }
+  });
+
+  console.log("✅ System Ready!");
+}
+
+// Start the application
+init();
+</script>
 </body>
 </html>
