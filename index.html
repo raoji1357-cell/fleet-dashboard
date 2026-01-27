@@ -1,207 +1,281 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Fleet Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<title>Fleet Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: #f1f5f9;
+  display: flex;
+  height: 100vh;
+}
 
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      display: flex;
-      height: 100vh;
-      background: #f4f6f9;
-    }
+/* SIDEBAR */
+.sidebar {
+  width: 220px;
+  background: linear-gradient(180deg, #111827, #1f2933);
+  color: #fff;
+  padding: 20px;
+}
 
-    /* Sidebar */
-    .sidebar {
-      width: 220px;
-      background: linear-gradient(180deg,#1f2933,#111827);
-      color: #fff;
-      padding-top: 20px;
-    }
+.sidebar h2 {
+  color: #facc15;
+  text-align: center;
+  margin-bottom: 30px;
+}
 
-    .sidebar h2 {
-      text-align: center;
-      color: #fbbf24;
-      margin-bottom: 30px;
-    }
+.menu {
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
 
-    .menu-item {
-      padding: 14px 20px;
-      cursor: pointer;
-      opacity: .85;
-    }
+.menu.active,
+.menu:hover {
+  background: #374151;
+}
 
-    .menu-item.active,
-    .menu-item:hover {
-      background: rgba(255,255,255,.1);
-      opacity: 1;
-    }
+/* MAIN */
+.main {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+}
 
-    /* Main */
-    .main {
-      flex: 1;
-      padding: 30px;
-      overflow-y: auto;
-    }
+/* FILTER BOX */
+.filter-box {
+  background: #fff;
+  padding: 20px;
+  border-radius: 14px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  max-width: 520px;
+}
 
-    .filters {
-      display: flex;
-      gap: 20px;
-      margin-bottom: 25px;
-      flex-wrap: wrap;
-    }
+.filter-box h1 {
+  margin-top: 0;
+}
 
-    .filters input {
-      padding: 10px;
-      font-size: 14px;
-      width: 240px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
+label {
+  display: block;
+  margin-top: 15px;
+  font-weight: 600;
+}
 
-    /* Suggestions */
-    .suggestions {
-      background: #fff;
-      border-radius: 6px;
-      box-shadow: 0 6px 16px rgba(0,0,0,.1);
-      max-width: 240px;
-      position: absolute;
-      z-index: 10;
-    }
+input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 6px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 15px;
+}
 
-    .suggestions div {
-      padding: 10px;
-      cursor: pointer;
-    }
+button {
+  margin-top: 20px;
+  width: 100%;
+  padding: 12px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
 
-    .suggestions div:hover {
-      background: #f1f5f9;
-    }
+button:hover {
+  background: #1d4ed8;
+}
 
-    /* Driver Card */
-    .card {
-      background: #fff;
-      border-radius: 14px;
-      padding: 25px;
-      max-width: 600px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.08);
-    }
+/* SUGGESTIONS */
+.suggestions {
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  margin-top: 5px;
+  max-height: 180px;
+  overflow-y: auto;
+}
 
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
+.suggestions div {
+  padding: 10px;
+  cursor: pointer;
+}
 
-    .card-header h3 {
-      margin: 0;
-    }
+.suggestions div:hover {
+  background: #e5e7eb;
+}
 
-    .metrics {
-      display: grid;
-      grid-template-columns: repeat(2,1fr);
-      gap: 15px;
-    }
+/* RESULT CARD */
+.result {
+  margin-top: 30px;
+}
 
-    .metric {
-      background: linear-gradient(135deg,#f8fafc,#eef2ff);
-      border-radius: 10px;
-      padding: 15px;
-      text-align: center;
-    }
+.card {
+  background: linear-gradient(135deg, #020617, #1e293b);
+  color: white;
+  border-radius: 18px;
+  padding: 25px;
+  max-width: 620px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+}
 
-    .metric span {
-      display: block;
-      font-size: 12px;
-      color: #64748b;
-    }
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-    .metric strong {
-      font-size: 20px;
-      color: #111827;
-    }
-  </style>
+.card-header h2 {
+  margin: 0;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+  margin-top: 25px;
+}
+
+.metric {
+  background: rgba(255,255,255,0.08);
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.metric span {
+  display: block;
+  font-size: 13px;
+  color: #cbd5f5;
+}
+
+.metric strong {
+  font-size: 22px;
+}
+</style>
 </head>
 
 <body>
 
 <!-- SIDEBAR -->
 <div class="sidebar">
-  <h2>🚗 Fleet Reports</h2>
-  <div class="menu-item active">Day Wise</div>
-  <div class="menu-item">Month Wise</div>
-  <div class="menu-item">Scheme Wise</div>
+  <h2>📊 Fleet Reports</h2>
+  <div class="menu active">Day Wise</div>
+  <div class="menu">Month Wise</div>
+  <div class="menu">Scheme Wise</div>
 </div>
 
 <!-- MAIN -->
 <div class="main">
+  <div class="filter-box">
+    <h1>Day Wise Report</h1>
 
-  <h2>Day Wise Driver Report</h2>
-
-  <div class="filters">
+    <label>Select Date</label>
     <input type="date" id="dateInput">
-    <input type="text" id="searchInput" placeholder="Search driver or car">
+
+    <label>Search by Driver Name / Car Number</label>
+    <input type="text" id="searchInput" placeholder="Type name or car number">
+    <div class="suggestions" id="suggestions"></div>
+
+    <button onclick="searchReport()">Search</button>
   </div>
 
-  <div class="suggestions" id="suggestions"></div>
-
-  <div id="result"></div>
-
+  <div class="result" id="result"></div>
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycby7FZ3r-XR9ADkEh12Q43y3vTnq0wyadGo0FrbzY6TZVuMLaxxZSi4J75QXwg4vemZ27w/exec";
+/* 🔗 API URL */
+const API_URL = "PASTE_YOUR_API_URL_HERE";
 
 let apiData = [];
+let uniqueList = [];
 
-/* Load API once */
+/* LOAD DATA */
 fetch(API_URL)
-  .then(r => r.json())
-  .then(d => apiData = d);
+  .then(res => res.json())
+  .then(data => {
+    apiData = data;
 
-/* Search */
+    const map = new Map();
+    data.forEach(d => {
+      d.records.forEach(r => {
+        const key = r.SH_Driver1_Name + r.CarNumber;
+        if (!map.has(key)) {
+          map.set(key, {
+            name: r.SH_Driver1_Name,
+            car: r.CarNumber
+          });
+        }
+      });
+    });
+    uniqueList = [...map.values()];
+  });
+
+/* SUGGESTIONS */
 const searchInput = document.getElementById("searchInput");
-const dateInput = document.getElementById("dateInput");
 const suggestions = document.getElementById("suggestions");
-const result = document.getElementById("result");
 
 searchInput.addEventListener("input", () => {
   const q = searchInput.value.toLowerCase();
-  const date = dateInput.value;
   suggestions.innerHTML = "";
 
-  if (!q || !date) return;
+  if (!q) return;
 
-  apiData
-    .filter(d => d.date === date)
-    .flatMap(d => d.records)
-    .filter(r =>
-      r.SH_Driver1_Name?.toLowerCase().includes(q) ||
-      r.CarNumber?.toLowerCase().includes(q)
+  uniqueList
+    .filter(x =>
+      x.name.toLowerCase().includes(q) ||
+      x.car.toLowerCase().includes(q)
     )
-    .slice(0,6)
-    .forEach(r => {
+    .slice(0, 8)
+    .forEach(x => {
       const div = document.createElement("div");
-      div.textContent = `${r.SH_Driver1_Name} (${r.CarNumber})`;
-      div.onclick = () => showReport(r, date);
+      div.textContent = `${x.name} (${x.car})`;
+      div.onclick = () => {
+        searchInput.value = div.textContent;
+        suggestions.innerHTML = "";
+      };
       suggestions.appendChild(div);
     });
 });
 
-function showReport(r, date) {
-  suggestions.innerHTML = "";
+/* SEARCH */
+function searchReport() {
+  const date = document.getElementById("dateInput").value;
+  const text = searchInput.value;
+  const result = document.getElementById("result");
+
+  if (!date || !text) {
+    alert("Please select Date and Driver / Car Number");
+    return;
+  }
+
+  const car = text.match(/\((.*?)\)/)[1];
+  const name = text.replace(/\(.*?\)/, "").trim();
+
+  const day = apiData.find(d => d.date === date);
+  if (!day) {
+    result.innerHTML = "<p>No data for selected date</p>";
+    return;
+  }
+
+  const r = day.records.find(x =>
+    x.SH_Driver1_Name === name &&
+    x.CarNumber === car
+  );
+
+  if (!r) {
+    result.innerHTML = "<p>No matching record found</p>";
+    return;
+  }
 
   result.innerHTML = `
     <div class="card">
       <div class="card-header">
-        <h3>${r.SH_Driver1_Name}</h3>
+        <h2>${r.SH_Driver1_Name}</h2>
         <span>${r.CarNumber}</span>
       </div>
 
@@ -226,8 +300,8 @@ function showReport(r, date) {
           <strong>₹${r.Cash_Driver_1}</strong>
         </div>
 
-        <div class="metric" style="grid-column: span 2;">
-          <span>Total Earning</span>
+        <div class="metric" style="grid-column:span 2">
+          <span>Total Earnings</span>
           <strong>₹${r.Total_Earning_Driver_1}</strong>
         </div>
       </div>
